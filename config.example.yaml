@@ -1,0 +1,46 @@
+# Example configuration file for Fairness Check
+# Copy this to config.yaml and update with your settings
+
+# Classifier endpoint configuration
+endpoint:
+  # URL of the classifier endpoint
+  url: "https://api.example.com/classify"
+
+  # HTTP method (GET or POST)
+  method: "POST"
+
+  # HTTP headers (optional)
+  headers:
+    Content-Type: "application/json"
+    User-Agent: "FairnessCheck/0.1.0"
+
+  # Request timeout in seconds
+  timeout: 30
+
+  # Authentication token (optional)
+  # auth_token: "your-api-token-here"
+
+# Test dataset configuration
+dataset:
+  # Path to the CSV file containing test data
+  path: "data/test_dataset.example.csv"
+
+  # Column name containing the features to send to the classifier
+  # The content of this column will be sent in the request
+  features_column: "features"
+
+  # Column name containing the true labels (0 or 1)
+  labels_column: "label"
+
+  # Column name containing the sensitive attribute (e.g., gender, race, age_group)
+  sensitive_column: "sensitive_attribute"
+
+# Fairness thresholds (optional)
+fairness:
+  # Maximum acceptable demographic parity difference (default: 0.1)
+  # 0 = perfect fairness, higher values indicate greater disparity
+  demographic_parity_threshold: 0.1
+
+  # Maximum acceptable equal opportunity difference (default: 0.1)
+  # Measures difference in true positive rates between groups
+  equal_opportunity_threshold: 0.1

@@ -1,0 +1,59 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+.tox/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+docs/
+*.md
+README.md
+
+# Mock server (not needed in fairness-check container)
+mock_server/
+
+# Test files
+tests/
+test_*.py
+*_test.py
+
+# Config examples and data (users will mount their own)
+config.yaml
+config.example.yaml
+data/
+
+# Misc
+.DS_Store
+verify_setup.py

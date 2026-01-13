@@ -1,0 +1,7 @@
+features,label,sensitive_attribute
+"feature_value_1",1,"group_A"
+"feature_value_2",0,"group_A"
+"feature_value_3",1,"group_A"
+"feature_value_4",0,"group_B"
+"feature_value_5",1,"group_B"
+"feature_value_6",0,"group_B"

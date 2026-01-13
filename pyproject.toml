@@ -1,0 +1,93 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fairness-check"
+version = "0.1.0"
+description = "A command-line tool for testing fairness of segment classifiers via endpoint APIs"
+readme = "README.md"
+requires-python = ">=3.10,<4.0"
+license = {text = "MIT"}
+authors = [
+    {name = "Gemma Cabero", email = "gemmacabero@gmail.com"}
+]
+keywords = ["fairness", "machine-learning", "bias", "cli", "testing"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+dependencies = [
+    "docopt-ng>=0.9.0",
+    "pyyaml>=6.0.1",
+    "requests>=2.31.0",
+    "numpy>=1.24.0",
+    "pandas>=2.0.0",
+    "pydantic>=2.0.0",
+]
+
+[project.scripts]
+fairness-check = "fairness_check.fairness_check_cmd:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.12.0",
+    "requests-mock>=1.11.0",
+    "black>=23.0.0",
+    "flask>=2.2.5",
+    "fairlearn>=0.10.0",
+    "scikit-learn>=1.3.0",
+]
+
+docs = [
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.0.0",
+    "mkdocstrings[python]>=0.24.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/fairness-check"
+Documentation = "https://fairness-check.readthedocs.io"
+Repository = "https://github.com/yourusername/fairness-check"
+Issues = "https://github.com/yourusername/fairness-check/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+fairness_check = ["py.typed"]
+
+[tool.black]
+line-length = 100
+target-version = ['py310']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+pythonpath = ["src"]
