@@ -8,7 +8,7 @@ from typing import Any
 import pandas as pd
 import numpy as np
 
-from .ai_client import ClassifierClient
+from .inference_client import InferenceClient
 from .config import Config
 from .metrics import (
     calculate_accuracy,
@@ -71,7 +71,7 @@ def run_fairness_check(config: Config, verbose: bool = False) -> dict[str, Any]:
     y_true = df[labels_col].values
     sensitive_features = df[sensitive_col].values
 
-    #Get answers from the AI system we want to evaluate fairness accross
+    # Get answers from the AI system we want to evaluate fairness accross
     y_pred = get_predictions(config, features_list)
 
     # Calculate fairness metrics
@@ -81,27 +81,27 @@ def run_fairness_check(config: Config, verbose: bool = False) -> dict[str, Any]:
 
 
 def get_predictions(config, features_list: list[Any], verbose=None) -> np.ndarray:
-    """  Given the inputs to the model it calls the system to evaluate via restful
-    API to get the predictions  """
+    """Given the inputs to the model it calls the system to evaluate via restful
+    API to get the predictions"""
 
     if verbose:
         logger.info("Calling endpoint to get model's answers ...")
     predictions = []
-    with ClassifierClient(config.endpoint) as client:
+    with InferenceClient(config.endpoint) as client:
         for i, features in enumerate(features_list):
             if verbose and (i + 1) % 10 == 0:
                 logger.info(f"  Progress: {i + 1}/{len(features_list)} samples")
 
-            pred = client.predict(features)
+            pred = client.infer(features)
             predictions.append(pred)
     y_pred = np.array(predictions)
     return y_pred
 
 
 def calculate_metrics(config, sensitive_features, y_pred, y_true, verbose=None):
-    """ Given the results from the model, the labelled correct answers and the
+    """Given the results from the model, the labelled correct answers and the
     sensitive data that we are calculating fairness against it, it calculates some
-    statistical measures relevant to fairness evaluation """
+    statistical measures relevant to fairness evaluation"""
 
     if verbose:
         logger.info("Calculating fairness metrics...")

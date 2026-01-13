@@ -33,7 +33,7 @@ def check_imports():
         return False
 
     try:
-        from fairness_check.ai_client import ClassifierClient
+        from fairness_check.inference_client import InferenceClient
         print("✓ Client module found")
     except ImportError as e:
         print(f"✗ Failed to import client: {e}")

@@ -1,7 +1,7 @@
 """
 Tests for fairness_check.runner module.
 
-Tests test orchestration, dataset loading, and prediction gathering.
+Tests test orchestration, dataset loading, and inference gathering.
 """
 
 import pytest
@@ -84,9 +84,9 @@ class TestGetPredictions:
         features_list = ['feat1', 'feat2', 'feat3']
         expected_predictions = [1, 0, 1]
 
-        with patch('fairness_check.runner.ClassifierClient') as MockClient:
+        with patch('fairness_check.runner.InferenceClient') as MockClient:
             mock_client_instance = Mock()
-            mock_client_instance.predict.side_effect = expected_predictions
+            mock_client_instance.infer.side_effect = expected_predictions
             mock_client_instance.__enter__ = Mock(return_value=mock_client_instance)
             mock_client_instance.__exit__ = Mock(return_value=False)
             MockClient.return_value = mock_client_instance
@@ -96,7 +96,7 @@ class TestGetPredictions:
             assert isinstance(predictions, np.ndarray)
             assert len(predictions) == 3
             assert list(predictions) == expected_predictions
-            assert mock_client_instance.predict.call_count == 3
+            assert mock_client_instance.infer.call_count == 3
 
     def test_get_predictions_with_verbose_logging(self, full_config, caplog):
         """Test verbose logging during prediction gathering."""
@@ -106,9 +106,9 @@ class TestGetPredictions:
         features_list = [f'feat{i}' for i in range(15)]  # 15 features to trigger progress logs
         predictions = [1] * 15
 
-        with patch('fairness_check.runner.ClassifierClient') as MockClient:
+        with patch('fairness_check.runner.InferenceClient') as MockClient:
             mock_client_instance = Mock()
-            mock_client_instance.predict.side_effect = predictions
+            mock_client_instance.infer.side_effect = predictions
             mock_client_instance.__enter__ = Mock(return_value=mock_client_instance)
             mock_client_instance.__exit__ = Mock(return_value=False)
             MockClient.return_value = mock_client_instance
@@ -117,15 +117,15 @@ class TestGetPredictions:
 
             assert len(result) == 15
             # Check that progress logging happened (every 10 samples)
-            assert mock_client_instance.predict.call_count == 15
+            assert mock_client_instance.infer.call_count == 15
 
     def test_get_predictions_uses_context_manager(self, full_config):
-        """Test that ClassifierClient is used as context manager."""
+        """Test that InferenceClient is used as context manager."""
         features_list = ['feat1', 'feat2']
 
-        with patch('fairness_check.runner.ClassifierClient') as MockClient:
+        with patch('fairness_check.runner.InferenceClient') as MockClient:
             mock_client_instance = Mock()
-            mock_client_instance.predict.return_value = 1
+            mock_client_instance.infer.return_value = 1
             mock_client_instance.__enter__ = Mock(return_value=mock_client_instance)
             mock_client_instance.__exit__ = Mock(return_value=False)
             MockClient.return_value = mock_client_instance
@@ -138,7 +138,7 @@ class TestGetPredictions:
 
     def test_get_predictions_empty_list(self, full_config):
         """Test getting predictions with empty features list."""
-        with patch('fairness_check.runner.ClassifierClient') as MockClient:
+        with patch('fairness_check.runner.InferenceClient') as MockClient:
             mock_client_instance = Mock()
             mock_client_instance.__enter__ = Mock(return_value=mock_client_instance)
             mock_client_instance.__exit__ = Mock(return_value=False)
@@ -151,9 +151,9 @@ class TestGetPredictions:
 
     def test_get_predictions_single_feature(self, full_config):
         """Test getting prediction for single feature."""
-        with patch('fairness_check.runner.ClassifierClient') as MockClient:
+        with patch('fairness_check.runner.InferenceClient') as MockClient:
             mock_client_instance = Mock()
-            mock_client_instance.predict.return_value = 1
+            mock_client_instance.infer.return_value = 1
             mock_client_instance.__enter__ = Mock(return_value=mock_client_instance)
             mock_client_instance.__exit__ = Mock(return_value=False)
             MockClient.return_value = mock_client_instance
@@ -273,9 +273,9 @@ class TestRunFairnessCheck:
         full_config.dataset.path = str(temp_csv_file)
 
         # Mock the classifier to return controlled predictions
-        with patch('fairness_check.runner.ClassifierClient') as MockClient:
+        with patch('fairness_check.runner.InferenceClient') as MockClient:
             mock_client_instance = Mock()
-            mock_client_instance.predict.return_value = 1
+            mock_client_instance.infer.return_value = 1
             mock_client_instance.__enter__ = Mock(return_value=mock_client_instance)
             mock_client_instance.__exit__ = Mock(return_value=False)
             MockClient.return_value = mock_client_instance
@@ -295,9 +295,9 @@ class TestRunFairnessCheck:
 
         full_config.dataset.path = str(temp_csv_file)
 
-        with patch('fairness_check.runner.ClassifierClient') as MockClient:
+        with patch('fairness_check.runner.InferenceClient') as MockClient:
             mock_client_instance = Mock()
-            mock_client_instance.predict.return_value = 0
+            mock_client_instance.infer.return_value = 0
             mock_client_instance.__enter__ = Mock(return_value=mock_client_instance)
             mock_client_instance.__exit__ = Mock(return_value=False)
             MockClient.return_value = mock_client_instance
@@ -372,9 +372,9 @@ class TestRunFairnessCheck:
         predictions = [1, 1, 1, 1, 1, 0, 0, 0, 0, 0,  # Group A: 5 positive
                       1, 1, 0, 0, 0, 0, 0, 0, 0, 0]  # Group B: 2 positive
 
-        with patch('fairness_check.runner.ClassifierClient') as MockClient:
+        with patch('fairness_check.runner.InferenceClient') as MockClient:
             mock_client_instance = Mock()
-            mock_client_instance.predict.side_effect = predictions
+            mock_client_instance.infer.side_effect = predictions
             mock_client_instance.__enter__ = Mock(return_value=mock_client_instance)
             mock_client_instance.__exit__ = Mock(return_value=False)
             MockClient.return_value = mock_client_instance
@@ -398,10 +398,10 @@ class TestRunFairnessCheck:
             )
         )
 
-        with patch('fairness_check.runner.ClassifierClient') as MockClient:
+        with patch('fairness_check.runner.InferenceClient') as MockClient:
             mock_client_instance = Mock()
             # Create biased predictions
-            mock_client_instance.predict.side_effect = [1, 1, 1, 0, 0, 0]
+            mock_client_instance.infer.side_effect = [1, 1, 1, 0, 0, 0]
             mock_client_instance.__enter__ = Mock(return_value=mock_client_instance)
             mock_client_instance.__exit__ = Mock(return_value=False)
             MockClient.return_value = mock_client_instance

@@ -20,6 +20,7 @@ Examples:
   fairness-check report config.yaml --verbose
   fairness-check validate config.yaml
 """
+
 import logging
 import sys
 from docopt import docopt
@@ -44,9 +45,7 @@ def setup_logging(verbose: bool = False) -> None:
 
     # Configure root logger
     logging.basicConfig(
-        level=level,
-        format='%(message)s',
-        handlers=[logging.StreamHandler(sys.stdout)]
+        level=level, format="%(message)s", handlers=[logging.StreamHandler(sys.stdout)]
     )
 
 
@@ -87,14 +86,21 @@ def main() -> None:
 
             # Check thresholds
             demographic_parity_threshold = config.fairness.demographic_parity_threshold
-            if results["fairness_metrics"]["demographic_parity_difference"] > demographic_parity_threshold:
-                print(f"\n⚠️  Warning: Demographic parity difference exceeds {demographic_parity_threshold} threshold")
+            if (
+                results["fairness_metrics"]["demographic_parity_difference"]
+                > demographic_parity_threshold
+            ):
+                print(
+                    f"\n⚠️  Warning: Demographic parity difference exceeds {demographic_parity_threshold} threshold"
+                )
             else:
                 print("\n✓ Demographic parity difference thresholds met")
 
             equal_odds_threshold = config.fairness.equal_opportunity_threshold
             if results["fairness_metrics"]["demographic_parity_difference"] > equal_odds_threshold:
-                print(f"\n⚠️  Warning: Equal opportunity difference exceeds {demographic_parity_threshold} threshold")
+                print(
+                    f"\n⚠️  Warning: Equal opportunity difference exceeds {demographic_parity_threshold} threshold"
+                )
             else:
                 print("\n✓ Equal opportunity difference thresholds met")
 

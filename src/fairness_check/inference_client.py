@@ -9,7 +9,7 @@ import requests
 from fairness_check.config import EndpointConfig
 
 
-class ClassifierClient:
+class InferenceClient:
     """Client for making predictions via a client endpoint."""
 
     def __init__(self, config: EndpointConfig) -> None:
@@ -29,28 +29,30 @@ class ClassifierClient:
         if config.auth_token:
             self.session.headers["Authorization"] = f"Bearer {config.auth_token}"
 
-    def predict(self, features: Any) -> int:
+    def infer(self, api_input: Any) -> int:
         """
-        Get prediction for a single sample.
+        Get the prediction or inference from a/an ML/AI system that's exposed via a
+        Restful API.
 
         Parameters
         ----------
-        features : Any
-            Features to classify (format depends on endpoint).
+        api_input : Any. Ideally a json-serializable object.
 
         Returns
         -------
         int
-            Predicted class (usually 0 or 1).
+            Predicted value (usually 0 or 1). Although it can be extended to be a
+            more complex output with maybe different subclasses depending on the
+             use case we want to apply the fairness check to.
 
         Raises
         ------
         requests.RequestException
             If the request fails.
-        ValueError
-            If the response is invalid.
+        ValueError/RuntimeError
+            If the response is invalid and cannot be parsed.
         """
-        payload = {"features": features}
+        payload = {"features": api_input}
 
         try:
             if self.config.method == "POST":
@@ -65,8 +67,10 @@ class ClassifierClient:
             response.raise_for_status()
             data = response.json()
 
-            # Extract prediction from response
-            if "prediction" in data:
+            # Extract inference from response
+            if "inference" in data:
+                return int(data["inference"])
+            elif "prediction" in data:
                 return int(data["prediction"])
             elif "class" in data:
                 return int(data["class"])
@@ -74,7 +78,7 @@ class ClassifierClient:
                 raise ValueError(f"Invalid response format: {data}")
 
         except requests.RequestException as e:
-            raise RuntimeError(f"Failed to get prediction from endpoint: {e}")
+            raise RuntimeError(f"Failed to get inference from endpoint: {e}")
         except ValueError as e:
             raise RuntimeError(f"Invalid response format: {data}")
 
@@ -82,7 +86,7 @@ class ClassifierClient:
         """Close the session."""
         self.session.close()
 
-    def __enter__(self) -> "ClassifierClient":
+    def __enter__(self) -> "InferenceClient":
         """Context manager entry."""
         return self
 

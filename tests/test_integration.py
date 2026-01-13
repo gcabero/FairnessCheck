@@ -14,7 +14,7 @@ from yaml.parser import ParserError
 
 from fairness_check.config import load_config, Config, EndpointConfig, DatasetConfig, FairnessConfig
 from fairness_check.runner import run_fairness_check
-from fairness_check.ai_client import ClassifierClient
+from fairness_check.inference_client import InferenceClient
 
 
 class TestEndToEndConfigToReport:
@@ -58,9 +58,9 @@ class TestEndToEndConfigToReport:
         # Mock classifier with fair predictions (same rate for both groups)
         fair_predictions = [1, 0, 1, 0, 1] * 4  # 50% positive for both groups
 
-        with patch('fairness_check.runner.ClassifierClient') as MockClient:
+        with patch('fairness_check.runner.InferenceClient') as MockClient:
             mock_client = Mock()
-            mock_client.predict.side_effect = fair_predictions
+            mock_client.infer.side_effect = fair_predictions
             mock_client.__enter__ = Mock(return_value=mock_client)
             mock_client.__exit__ = Mock(return_value=False)
             MockClient.return_value = mock_client
@@ -108,9 +108,9 @@ class TestEndToEndConfigToReport:
         # Mock classifier with biased predictions (GroupA gets more positives)
         biased_predictions = [1] * 10 + [0] * 10  # 100% for A, 0% for B
 
-        with patch('fairness_check.runner.ClassifierClient') as MockClient:
+        with patch('fairness_check.runner.InferenceClient') as MockClient:
             mock_client = Mock()
-            mock_client.predict.side_effect = biased_predictions
+            mock_client.infer.side_effect = biased_predictions
             mock_client.__enter__ = Mock(return_value=mock_client)
             mock_client.__exit__ = Mock(return_value=False)
             MockClient.return_value = mock_client
@@ -158,9 +158,9 @@ class TestEndToEndConfigToReport:
         assert config.endpoint.auth_token == 'secret-token-123'
         assert config.endpoint.headers['Content-Type'] == 'application/json'
 
-        with patch('fairness_check.runner.ClassifierClient') as MockClient:
+        with patch('fairness_check.runner.InferenceClient') as MockClient:
             mock_client = Mock()
-            mock_client.predict.return_value = 1
+            mock_client.infer.return_value = 1
             mock_client.__enter__ = Mock(return_value=mock_client)
             mock_client.__exit__ = Mock(return_value=False)
             MockClient.return_value = mock_client
@@ -168,7 +168,7 @@ class TestEndToEndConfigToReport:
             # Run fairness check
             results = run_fairness_check(config)
 
-            # Verify ClassifierClient was initialized with correct config
+            # Verify InferenceClient was initialized with correct config
             MockClient.assert_called_once()
             call_args = MockClient.call_args[0][0]
             assert call_args.auth_token == 'secret-token-123'
@@ -206,9 +206,9 @@ class TestEndToEndConfigToReport:
         # Mock with somewhat biased predictions
         predictions = [1, 1, 0, 1]  # A: 2/2=1.0, B: 1/2=0.5, diff=0.5
 
-        with patch('fairness_check.runner.ClassifierClient') as MockClient:
+        with patch('fairness_check.runner.InferenceClient') as MockClient:
             mock_client = Mock()
-            mock_client.predict.side_effect = predictions
+            mock_client.infer.side_effect = predictions
             mock_client.__enter__ = Mock(return_value=mock_client)
             mock_client.__exit__ = Mock(return_value=False)
             MockClient.return_value = mock_client
@@ -284,9 +284,9 @@ class TestIntegrationWithRealComponents:
         # Male: 35/50 = 0.7, Female: 25/50 = 0.5, DP diff = 0.2
         predictions = [1] * 35 + [0] * 15 + [1] * 25 + [0] * 25
 
-        with patch('fairness_check.runner.ClassifierClient') as MockClient:
+        with patch('fairness_check.runner.InferenceClient') as MockClient:
             mock_client = Mock()
-            mock_client.predict.side_effect = predictions
+            mock_client.infer.side_effect = predictions
             mock_client.__enter__ = Mock(return_value=mock_client)
             mock_client.__exit__ = Mock(return_value=False)
             MockClient.return_value = mock_client
@@ -358,9 +358,9 @@ class TestIntegrationErrorScenarios:
             fairness=FairnessConfig()
         )
 
-        with patch('fairness_check.runner.ClassifierClient') as MockClient:
+        with patch('fairness_check.runner.InferenceClient') as MockClient:
             mock_client = Mock()
-            mock_client.predict.side_effect = RuntimeError("Connection refused")
+            mock_client.infer.side_effect = RuntimeError("Connection refused")
             mock_client.__enter__ = Mock(return_value=mock_client)
             mock_client.__exit__ = Mock(return_value=False)
             MockClient.return_value = mock_client
@@ -397,9 +397,9 @@ class TestIntegrationMultipleGroups:
             [1] * 3 + [0] * 7       # White
         )
 
-        with patch('fairness_check.runner.ClassifierClient') as MockClient:
+        with patch('fairness_check.runner.InferenceClient') as MockClient:
             mock_client = Mock()
-            mock_client.predict.side_effect = predictions
+            mock_client.infer.side_effect = predictions
             mock_client.__enter__ = Mock(return_value=mock_client)
             mock_client.__exit__ = Mock(return_value=False)
             MockClient.return_value = mock_client
@@ -429,9 +429,9 @@ class TestIntegrationMultipleGroups:
         # Equal predictions across all groups (perfect fairness)
         predictions = [1, 0, 1, 0, 1, 0, 1, 0, 1, 0] * 5  # 50% for each group
 
-        with patch('fairness_check.runner.ClassifierClient') as MockClient:
+        with patch('fairness_check.runner.InferenceClient') as MockClient:
             mock_client = Mock()
-            mock_client.predict.side_effect = predictions
+            mock_client.infer.side_effect = predictions
             mock_client.__enter__ = Mock(return_value=mock_client)
             mock_client.__exit__ = Mock(return_value=False)
             MockClient.return_value = mock_client

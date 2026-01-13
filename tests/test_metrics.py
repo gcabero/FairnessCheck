@@ -29,7 +29,9 @@ class TestCalculateAccuracy:
         y_true = np.array([1, 0, 1, 0, 1, 0])
         y_pred = np.array([0, 1, 0, 1, 0, 1])
         accuracy = calculate_accuracy(y_true, y_pred)
-        assert accuracy == pytest.approx(0.0), "Completely wrong predictions should have accuracy 0.0"
+        assert accuracy == pytest.approx(
+            0.0
+        ), "Completely wrong predictions should have accuracy 0.0"
 
     def test_fifty_percent_accuracy(self):
         """Test accuracy with 50% correct predictions."""
@@ -69,18 +71,18 @@ class TestCalculateDemographicParityDifference:
         """Test demographic parity with perfect fairness."""
         # Both groups have 2/3 positive predictions (0.6667)
         dp_diff = calculate_demographic_parity_difference(
-            perfect_fairness_data['y_pred'],
-            perfect_fairness_data['sensitive']
+            perfect_fairness_data["y_pred"], perfect_fairness_data["sensitive"]
         )
-        assert dp_diff == pytest.approx(0.0, abs=1e-9), "Perfect fairness should have DP difference of 0"
+        assert dp_diff == pytest.approx(
+            0.0, abs=1e-9
+        ), "Perfect fairness should have DP difference of 0"
 
     def test_maximum_unfairness(self, biased_data):
         """Test demographic parity with maximum bias."""
         # Group A: 3/3 = 1.0, Group B: 0/3 = 0.0
         # Difference: 1.0 - 0.0 = 1.0
         dp_diff = calculate_demographic_parity_difference(
-            biased_data['y_pred'],
-            biased_data['sensitive']
+            biased_data["y_pred"], biased_data["sensitive"]
         )
         assert dp_diff == pytest.approx(1.0), "Maximum bias should have DP difference of 1.0"
 
@@ -89,7 +91,7 @@ class TestCalculateDemographicParityDifference:
         # Group A: 2/4 = 0.5, Group B: 1/4 = 0.25
         # Difference: 0.5 - 0.25 = 0.25
         y_pred = np.array([1, 0, 1, 0, 1, 0, 0, 0])
-        sensitive = np.array(['A', 'A', 'A', 'A', 'B', 'B', 'B', 'B'])
+        sensitive = np.array(["A", "A", "A", "A", "B", "B", "B", "B"])
         dp_diff = calculate_demographic_parity_difference(y_pred, sensitive)
         assert dp_diff == pytest.approx(0.25)
 
@@ -97,24 +99,21 @@ class TestCalculateDemographicParityDifference:
         """Test demographic parity with only one group."""
         # Should return 0.0 (max - min = same value)
         dp_diff = calculate_demographic_parity_difference(
-            edge_case_single_group['y_pred'],
-            edge_case_single_group['sensitive']
+            edge_case_single_group["y_pred"], edge_case_single_group["sensitive"]
         )
         assert dp_diff == pytest.approx(0.0)
 
     def test_empty_arrays(self, edge_case_empty):
         """Test demographic parity with empty arrays."""
         dp_diff = calculate_demographic_parity_difference(
-            edge_case_empty['y_pred'],
-            edge_case_empty['sensitive']
+            edge_case_empty["y_pred"], edge_case_empty["sensitive"]
         )
         assert dp_diff == pytest.approx(0.0)
 
     def test_single_sample(self, edge_case_single_sample):
         """Test demographic parity with single sample."""
         dp_diff = calculate_demographic_parity_difference(
-            edge_case_single_sample['y_pred'],
-            edge_case_single_sample['sensitive']
+            edge_case_single_sample["y_pred"], edge_case_single_sample["sensitive"]
         )
         assert dp_diff == pytest.approx(0.0)
 
@@ -122,22 +121,21 @@ class TestCalculateDemographicParityDifference:
         """Test demographic parity with 5 different groups."""
         # Each group has 2 samples: [1,0] = 0.5 selection rate for all
         dp_diff = calculate_demographic_parity_difference(
-            multiple_groups_data['y_pred'],
-            multiple_groups_data['sensitive']
+            multiple_groups_data["y_pred"], multiple_groups_data["sensitive"]
         )
         assert dp_diff == pytest.approx(0.0, abs=1e-9)
 
     def test_all_predictions_zero(self):
         """Test demographic parity when all predictions are 0."""
         y_pred = np.array([0, 0, 0, 0, 0, 0])
-        sensitive = np.array(['A', 'A', 'A', 'B', 'B', 'B'])
+        sensitive = np.array(["A", "A", "A", "B", "B", "B"])
         dp_diff = calculate_demographic_parity_difference(y_pred, sensitive)
         assert dp_diff == pytest.approx(0.0)
 
     def test_all_predictions_one(self):
         """Test demographic parity when all predictions are 1."""
         y_pred = np.array([1, 1, 1, 1, 1, 1])
-        sensitive = np.array(['A', 'A', 'A', 'B', 'B', 'B'])
+        sensitive = np.array(["A", "A", "A", "B", "B", "B"])
         dp_diff = calculate_demographic_parity_difference(y_pred, sensitive)
         assert dp_diff == pytest.approx(0.0)
 
@@ -146,7 +144,7 @@ class TestCalculateDemographicParityDifference:
         # Group A: 3/3 = 1.0, Group B: 1/3 = 0.333, Group C: 0/3 = 0.0
         # Max difference: 1.0 - 0.0 = 1.0
         y_pred = np.array([1, 1, 1, 1, 0, 0, 0, 0, 0])
-        sensitive = np.array(['A', 'A', 'A', 'B', 'B', 'B', 'C', 'C', 'C'])
+        sensitive = np.array(["A", "A", "A", "B", "B", "B", "C", "C", "C"])
         dp_diff = calculate_demographic_parity_difference(y_pred, sensitive)
         assert dp_diff == pytest.approx(1.0)
 
@@ -167,7 +165,7 @@ class TestCalculateEqualOpportunityDifference:
         # Group B: TP=2, P=2, TPR=1.0
         y_true = np.array([1, 1, 0, 0, 1, 1, 0, 0])
         y_pred = np.array([1, 1, 0, 0, 1, 1, 0, 0])
-        sensitive = np.array(['A', 'A', 'A', 'A', 'B', 'B', 'B', 'B'])
+        sensitive = np.array(["A", "A", "A", "A", "B", "B", "B", "B"])
         eo_diff = calculate_equal_opportunity_difference(y_true, y_pred, sensitive)
         assert eo_diff == pytest.approx(0.0, abs=1e-9)
 
@@ -178,7 +176,7 @@ class TestCalculateEqualOpportunityDifference:
         # Difference: 1.0 - 0.0 = 1.0
         y_true = np.array([1, 1, 0, 0, 1, 1, 0, 0])
         y_pred = np.array([1, 1, 0, 0, 0, 0, 0, 0])
-        sensitive = np.array(['A', 'A', 'A', 'A', 'B', 'B', 'B', 'B'])
+        sensitive = np.array(["A", "A", "A", "A", "B", "B", "B", "B"])
         eo_diff = calculate_equal_opportunity_difference(y_true, y_pred, sensitive)
         assert eo_diff == pytest.approx(1.0)
 
@@ -189,7 +187,7 @@ class TestCalculateEqualOpportunityDifference:
         # Difference: 0.6667 - 0.5 = 0.1667
         y_true = np.array([1, 1, 1, 0, 0, 1, 1, 0])
         y_pred = np.array([1, 1, 0, 0, 1, 1, 0, 0])
-        sensitive = np.array(['A', 'A', 'A', 'A', 'A', 'B', 'B', 'B'])
+        sensitive = np.array(["A", "A", "A", "A", "A", "B", "B", "B"])
         eo_diff = calculate_equal_opportunity_difference(y_true, y_pred, sensitive)
         assert eo_diff == pytest.approx(0.1667, abs=1e-4)
 
@@ -200,7 +198,7 @@ class TestCalculateEqualOpportunityDifference:
         # Should only use Group A, so difference = 0.0
         y_true = np.array([1, 1, 0, 0, 0, 0])
         y_pred = np.array([1, 0, 0, 0, 1, 0])
-        sensitive = np.array(['A', 'A', 'A', 'B', 'B', 'B'])
+        sensitive = np.array(["A", "A", "A", "B", "B", "B"])
         eo_diff = calculate_equal_opportunity_difference(y_true, y_pred, sensitive)
         assert eo_diff == pytest.approx(0.0)
 
@@ -208,7 +206,7 @@ class TestCalculateEqualOpportunityDifference:
         """Test equal opportunity when no group has positive labels."""
         y_true = np.array([0, 0, 0, 0, 0, 0])
         y_pred = np.array([1, 0, 1, 0, 1, 0])
-        sensitive = np.array(['A', 'A', 'A', 'B', 'B', 'B'])
+        sensitive = np.array(["A", "A", "A", "B", "B", "B"])
         eo_diff = calculate_equal_opportunity_difference(y_true, y_pred, sensitive)
         assert eo_diff == pytest.approx(0.0)
 
@@ -216,7 +214,7 @@ class TestCalculateEqualOpportunityDifference:
         """Test equal opportunity with single group."""
         y_true = np.array([1, 1, 0, 0])
         y_pred = np.array([1, 0, 0, 0])
-        sensitive = np.array(['A', 'A', 'A', 'A'])
+        sensitive = np.array(["A", "A", "A", "A"])
         eo_diff = calculate_equal_opportunity_difference(y_true, y_pred, sensitive)
         assert eo_diff == pytest.approx(0.0)
 
@@ -233,8 +231,30 @@ class TestCalculateEqualOpportunityDifference:
         # 5 groups, each with TPR=0.5 (1 out of 2 positives correct)
         y_true = np.array([1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0])
         y_pred = np.array([1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0])
-        sensitive = np.array(['A', 'A', 'A', 'A', 'B', 'B', 'B', 'B', 'C', 'C', 'C', 'C',
-                              'D', 'D', 'D', 'D', 'E', 'E', 'E', 'E'])
+        sensitive = np.array(
+            [
+                "A",
+                "A",
+                "A",
+                "A",
+                "B",
+                "B",
+                "B",
+                "B",
+                "C",
+                "C",
+                "C",
+                "C",
+                "D",
+                "D",
+                "D",
+                "D",
+                "E",
+                "E",
+                "E",
+                "E",
+            ]
+        )
         eo_diff = calculate_equal_opportunity_difference(y_true, y_pred, sensitive)
         assert eo_diff == pytest.approx(0.0, abs=1e-9)
 
@@ -242,7 +262,7 @@ class TestCalculateEqualOpportunityDifference:
         """Test equal opportunity when all predictions are 0."""
         y_true = np.array([1, 1, 0, 0, 1, 1, 0, 0])
         y_pred = np.array([0, 0, 0, 0, 0, 0, 0, 0])
-        sensitive = np.array(['A', 'A', 'A', 'A', 'B', 'B', 'B', 'B'])
+        sensitive = np.array(["A", "A", "A", "A", "B", "B", "B", "B"])
         eo_diff = calculate_equal_opportunity_difference(y_true, y_pred, sensitive)
         assert eo_diff == pytest.approx(0.0)
 
@@ -250,7 +270,7 @@ class TestCalculateEqualOpportunityDifference:
         """Test equal opportunity when all predictions are 1."""
         y_true = np.array([1, 1, 0, 0, 1, 1, 0, 0])
         y_pred = np.array([1, 1, 1, 1, 1, 1, 1, 1])
-        sensitive = np.array(['A', 'A', 'A', 'A', 'B', 'B', 'B', 'B'])
+        sensitive = np.array(["A", "A", "A", "A", "B", "B", "B", "B"])
         eo_diff = calculate_equal_opportunity_difference(y_true, y_pred, sensitive)
         assert eo_diff == pytest.approx(0.0)
 
@@ -258,7 +278,7 @@ class TestCalculateEqualOpportunityDifference:
         """Test equal opportunity with different numpy dtypes."""
         y_true = np.array([1, 1, 0, 0], dtype=np.int32)
         y_pred = np.array([1, 0, 0, 0], dtype=np.int64)
-        sensitive = np.array(['A', 'A', 'B', 'B'], dtype=object)
+        sensitive = np.array(["A", "A", "B", "B"], dtype=object)
         eo_diff = calculate_equal_opportunity_difference(y_true, y_pred, sensitive)
         # Group A: TP=1, P=2, TPR=0.5; Group B: no positives
         assert eo_diff == pytest.approx(0.0)
@@ -266,9 +286,7 @@ class TestCalculateEqualOpportunityDifference:
     def test_fixture_biased_data(self, biased_data):
         """Test equal opportunity with biased fixture data."""
         eo_diff = calculate_equal_opportunity_difference(
-            biased_data['y_true'],
-            biased_data['y_pred'],
-            biased_data['sensitive']
+            biased_data["y_true"], biased_data["y_pred"], biased_data["sensitive"]
         )
         # Group A: TP=2, P=2, TPR=1.0
         # Group B: TP=0, P=1, TPR=0.0

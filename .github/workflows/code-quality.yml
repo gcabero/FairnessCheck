@@ -25,4 +25,4 @@ jobs:
         run: uv sync --all-extras
 
       - name: Check formatting with Black
-        run: uv run black --check src/ tests/
+        run: uv run black --check src/

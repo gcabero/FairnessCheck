@@ -6,7 +6,7 @@ import numpy as np
 
 
 def calculate_demographic_parity_difference(
-        y_pred: np.ndarray, sensitive_features: np.ndarray
+    y_pred: np.ndarray, sensitive_features: np.ndarray
 ) -> float:
     """
     Calculate demographic parity difference.
@@ -40,7 +40,7 @@ def calculate_demographic_parity_difference(
 
 
 def calculate_equal_opportunity_difference(
-        y_true: np.ndarray, y_pred: np.ndarray, sensitive_features: np.ndarray
+    y_true: np.ndarray, y_pred: np.ndarray, sensitive_features: np.ndarray
 ) -> float:
     """
     Calculate equal opportunity difference (TPR difference).
