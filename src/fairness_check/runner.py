@@ -87,11 +87,11 @@ def get_predictions(config, features_list: list[Any], verbose=None) -> np.ndarra
     if verbose:
         logger.info("Calling endpoint to get model's answers ...")
     predictions = []
+    # TODO: Add batching support or at least a sleep between request to avoid limit rating issues
     with InferenceClient(config.endpoint) as client:
         for i, features in enumerate(features_list):
             if verbose and (i + 1) % 10 == 0:
                 logger.info(f"  Progress: {i + 1}/{len(features_list)} samples")
-
             pred = client.infer(features)
             predictions.append(pred)
     y_pred = np.array(predictions)
