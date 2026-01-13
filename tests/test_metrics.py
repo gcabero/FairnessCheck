@@ -29,9 +29,7 @@ class TestCalculateAccuracy:
         y_true = np.array([1, 0, 1, 0, 1, 0])
         y_pred = np.array([0, 1, 0, 1, 0, 1])
         accuracy = calculate_accuracy(y_true, y_pred)
-        assert accuracy == pytest.approx(
-            0.0
-        ), "Completely wrong predictions should have accuracy 0.0"
+        assert accuracy == pytest.approx(0.0), "Completely wrong predictions should have accuracy 0.0"
 
     def test_fifty_percent_accuracy(self):
         """Test accuracy with 50% correct predictions."""
@@ -73,17 +71,13 @@ class TestCalculateDemographicParityDifference:
         dp_diff = calculate_demographic_parity_difference(
             perfect_fairness_data["y_pred"], perfect_fairness_data["sensitive"]
         )
-        assert dp_diff == pytest.approx(
-            0.0, abs=1e-9
-        ), "Perfect fairness should have DP difference of 0"
+        assert dp_diff == pytest.approx(0.0, abs=1e-9), "Perfect fairness should have DP difference of 0"
 
     def test_maximum_unfairness(self, biased_data):
         """Test demographic parity with maximum bias."""
         # Group A: 3/3 = 1.0, Group B: 0/3 = 0.0
         # Difference: 1.0 - 0.0 = 1.0
-        dp_diff = calculate_demographic_parity_difference(
-            biased_data["y_pred"], biased_data["sensitive"]
-        )
+        dp_diff = calculate_demographic_parity_difference(biased_data["y_pred"], biased_data["sensitive"])
         assert dp_diff == pytest.approx(1.0), "Maximum bias should have DP difference of 1.0"
 
     def test_known_difference(self):
@@ -105,9 +99,7 @@ class TestCalculateDemographicParityDifference:
 
     def test_empty_arrays(self, edge_case_empty):
         """Test demographic parity with empty arrays."""
-        dp_diff = calculate_demographic_parity_difference(
-            edge_case_empty["y_pred"], edge_case_empty["sensitive"]
-        )
+        dp_diff = calculate_demographic_parity_difference(edge_case_empty["y_pred"], edge_case_empty["sensitive"])
         assert dp_diff == pytest.approx(0.0)
 
     def test_single_sample(self, edge_case_single_sample):

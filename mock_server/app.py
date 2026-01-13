@@ -11,9 +11,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
 app = FastAPI(
-    title="Mock Classifier API",
-    version="1.0",
-    description="High-performance mock classifier for fairness testing"
+    title="Mock Classifier API", version="1.0", description="High-performance mock classifier for fairness testing"
 )
 
 
@@ -48,8 +46,8 @@ async def home():
             "/classify": "POST - Classify features and return prediction",
             "/classify/random": "POST - Random predictions for testing",
             "/classify/biased": "POST - Biased predictions for testing",
-            "/health": "GET - Health check"
-        }
+            "/health": "GET - Health check",
+        },
     }
 
 
@@ -70,10 +68,7 @@ async def classify(request: ClassifyRequest):
     # Return random binary prediction
     inference = random.choice([0, 1])
 
-    return {
-        "inference": inference,
-        "features": request.features
-    }
+    return {"inference": inference, "features": request.features}
 
 
 @app.post("/classify/random", response_model=ClassifyResponse)
@@ -87,10 +82,7 @@ async def classify_random(request: ClassifyRequest):
     # Return random binary prediction
     inference = random.choice([0, 1])
 
-    return {
-        "inference": inference,
-        "features": request.features
-    }
+    return {"inference": inference, "features": request.features}
 
 
 @app.post("/classify/biased", response_model=ClassifyResponse)
@@ -105,12 +97,13 @@ async def classify_biased(request: ClassifyRequest):
     return {
         "inference": 1,
         "features": request.features,
-        "note": "This is an intentionally biased endpoint for testing"
+        "note": "This is an intentionally biased endpoint for testing",
     }
 
 
 if __name__ == "__main__":
     import uvicorn
+
     # Run with uvicorn for production-grade performance
     # Supports multiple workers and async requests
     uvicorn.run(
@@ -118,5 +111,5 @@ if __name__ == "__main__":
         host="0.0.0.0",
         port=8000,
         reload=True,  # Auto-reload on code changes during development
-        log_level="info"
+        log_level="info",
     )

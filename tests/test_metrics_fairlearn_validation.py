@@ -15,6 +15,7 @@ try:
     from fairlearn.metrics import demographic_parity_difference as fl_dp_diff
     from fairlearn.metrics import equalized_odds_difference as fl_eo_diff
     from sklearn.metrics import accuracy_score
+
     FAIRLEARN_AVAILABLE = True
 except ImportError:
     FAIRLEARN_AVAILABLE = False
@@ -26,8 +27,7 @@ from fairness_check.metrics import (
 )
 
 pytestmark = pytest.mark.skipif(
-    not FAIRLEARN_AVAILABLE,
-    reason="fairlearn not installed (required for validation tests)"
+    not FAIRLEARN_AVAILABLE, reason="fairlearn not installed (required for validation tests)"
 )
 
 
@@ -38,38 +38,33 @@ class TestDemographicParityValidation:
         """Test that basic case matches fairlearn exactly."""
         y_true = np.array([1, 1, 0, 0, 1, 1, 0, 0])
         y_pred = np.array([1, 0, 1, 0, 1, 0, 0, 0])
-        sensitive = np.array(['A', 'A', 'A', 'A', 'B', 'B', 'B', 'B'])
+        sensitive = np.array(["A", "A", "A", "A", "B", "B", "B", "B"])
 
         custom_result = calculate_demographic_parity_difference(y_pred, sensitive)
         fairlearn_result = fl_dp_diff(y_true, y_pred, sensitive_features=sensitive)
 
-        assert custom_result == pytest.approx(fairlearn_result, abs=1e-9), \
-            f"Custom: {custom_result}, Fairlearn: {fairlearn_result}"
+        assert custom_result == pytest.approx(
+            fairlearn_result, abs=1e-9
+        ), f"Custom: {custom_result}, Fairlearn: {fairlearn_result}"
 
     def test_perfect_fairness_matches_fairlearn(self, perfect_fairness_data):
         """Test perfect fairness scenario matches fairlearn."""
         custom_result = calculate_demographic_parity_difference(
-            perfect_fairness_data['y_pred'],
-            perfect_fairness_data['sensitive']
+            perfect_fairness_data["y_pred"], perfect_fairness_data["sensitive"]
         )
         fairlearn_result = fl_dp_diff(
-            perfect_fairness_data['y_true'],
-            perfect_fairness_data['y_pred'],
-            sensitive_features=perfect_fairness_data['sensitive']
+            perfect_fairness_data["y_true"],
+            perfect_fairness_data["y_pred"],
+            sensitive_features=perfect_fairness_data["sensitive"],
         )
 
         assert custom_result == pytest.approx(fairlearn_result, abs=1e-9)
 
     def test_biased_case_matches_fairlearn(self, biased_data):
         """Test biased scenario matches fairlearn."""
-        custom_result = calculate_demographic_parity_difference(
-            biased_data['y_pred'],
-            biased_data['sensitive']
-        )
+        custom_result = calculate_demographic_parity_difference(biased_data["y_pred"], biased_data["sensitive"])
         fairlearn_result = fl_dp_diff(
-            biased_data['y_true'],
-            biased_data['y_pred'],
-            sensitive_features=biased_data['sensitive']
+            biased_data["y_true"], biased_data["y_pred"], sensitive_features=biased_data["sensitive"]
         )
 
         assert custom_result == pytest.approx(fairlearn_result, abs=1e-9)
@@ -77,13 +72,12 @@ class TestDemographicParityValidation:
     def test_multiple_groups_matches_fairlearn(self, multiple_groups_data):
         """Test multiple groups scenario matches fairlearn."""
         custom_result = calculate_demographic_parity_difference(
-            multiple_groups_data['y_pred'],
-            multiple_groups_data['sensitive']
+            multiple_groups_data["y_pred"], multiple_groups_data["sensitive"]
         )
         fairlearn_result = fl_dp_diff(
-            multiple_groups_data['y_true'],
-            multiple_groups_data['y_pred'],
-            sensitive_features=multiple_groups_data['sensitive']
+            multiple_groups_data["y_true"],
+            multiple_groups_data["y_pred"],
+            sensitive_features=multiple_groups_data["sensitive"],
         )
 
         assert custom_result == pytest.approx(fairlearn_result, abs=1e-9)
@@ -94,7 +88,7 @@ class TestDemographicParityValidation:
         n_samples = 1000
         y_true = np.random.randint(0, 2, n_samples)
         y_pred = np.random.randint(0, 2, n_samples)
-        sensitive = np.random.choice(['A', 'B', 'C'], n_samples)
+        sensitive = np.random.choice(["A", "B", "C"], n_samples)
 
         custom_result = calculate_demographic_parity_difference(y_pred, sensitive)
         fairlearn_result = fl_dp_diff(y_true, y_pred, sensitive_features=sensitive)
@@ -113,7 +107,7 @@ class TestEqualOpportunityValidation:
         """Test basic case TPR matches fairlearn's TPR component."""
         y_true = np.array([1, 1, 0, 0, 1, 1, 0, 0])
         y_pred = np.array([1, 0, 0, 0, 1, 0, 0, 0])
-        sensitive = np.array(['A', 'A', 'A', 'A', 'B', 'B', 'B', 'B'])
+        sensitive = np.array(["A", "A", "A", "A", "B", "B", "B", "B"])
 
         custom_result = calculate_equal_opportunity_difference(y_true, y_pred, sensitive)
 
@@ -127,7 +121,7 @@ class TestEqualOpportunityValidation:
         """Test perfect TPR equality across groups."""
         y_true = np.array([1, 1, 1, 1, 1, 1])
         y_pred = np.array([1, 1, 1, 1, 1, 1])
-        sensitive = np.array(['A', 'A', 'A', 'B', 'B', 'B'])
+        sensitive = np.array(["A", "A", "A", "B", "B", "B"])
 
         custom_result = calculate_equal_opportunity_difference(y_true, y_pred, sensitive)
         assert custom_result == pytest.approx(0.0)
@@ -136,7 +130,7 @@ class TestEqualOpportunityValidation:
         """Test maximum TPR difference."""
         y_true = np.array([1, 1, 0, 0, 1, 1, 0, 0])
         y_pred = np.array([1, 1, 0, 0, 0, 0, 0, 0])
-        sensitive = np.array(['A', 'A', 'A', 'A', 'B', 'B', 'B', 'B'])
+        sensitive = np.array(["A", "A", "A", "A", "B", "B", "B", "B"])
 
         custom_result = calculate_equal_opportunity_difference(y_true, y_pred, sensitive)
         # Group A: TPR=1.0, Group B: TPR=0.0
@@ -145,9 +139,7 @@ class TestEqualOpportunityValidation:
     def test_biased_data_tpr(self, biased_data):
         """Test TPR with biased data."""
         custom_result = calculate_equal_opportunity_difference(
-            biased_data['y_true'],
-            biased_data['y_pred'],
-            biased_data['sensitive']
+            biased_data["y_true"], biased_data["y_pred"], biased_data["sensitive"]
         )
         # Group A: y_true=[1,0,1], y_pred=[1,1,1], TP=2, P=2, TPR=1.0
         # Group B: y_true=[0,1,0], y_pred=[0,0,0], TP=0, P=1, TPR=0.0
@@ -229,8 +221,8 @@ class TestRealDatasetValidation:
 
         # Assuming standard column names
         y_pred = np.random.randint(0, 2, len(df))  # Mock predictions
-        y_true = df['label'].values
-        sensitive = df['sensitive_attribute'].values
+        y_true = df["label"].values
+        sensitive = df["sensitive_attribute"].values
 
         # Test demographic parity
         custom_dp = calculate_demographic_parity_difference(y_pred, sensitive)

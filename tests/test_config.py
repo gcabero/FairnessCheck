@@ -29,7 +29,7 @@ class TestEndpointConfig:
             method="POST",
             headers={"Content-Type": "application/json"},
             timeout=60,
-            auth_token="test-token-123"
+            auth_token="test-token-123",
         )
 
         assert config.url == "http://test.com/api"
@@ -83,11 +83,7 @@ class TestEndpointConfig:
 
     def test_custom_headers(self):
         """Test custom headers are stored correctly."""
-        headers = {
-            "Content-Type": "application/json",
-            "X-API-Key": "secret",
-            "Authorization": "Bearer token"
-        }
+        headers = {"Content-Type": "application/json", "X-API-Key": "secret", "Authorization": "Bearer token"}
         config = EndpointConfig(url="http://test.com/api", headers=headers)
         assert config.headers == headers
 
@@ -106,7 +102,7 @@ class TestDatasetConfig:
             path="/path/to/data.csv",
             features_column="input_features",
             labels_column="true_label",
-            sensitive_column="protected_attribute"
+            sensitive_column="protected_attribute",
         )
 
         assert config.path == "/path/to/data.csv"
@@ -130,12 +126,7 @@ class TestDatasetConfig:
 
     def test_custom_column_names(self):
         """Test custom column names are stored correctly."""
-        config = DatasetConfig(
-            path="data.csv",
-            features_column="X",
-            labels_column="y",
-            sensitive_column="group"
-        )
+        config = DatasetConfig(path="data.csv", features_column="X", labels_column="y", sensitive_column="group")
         assert config.features_column == "X"
         assert config.labels_column == "y"
         assert config.sensitive_column == "group"
@@ -146,10 +137,7 @@ class TestFairnessConfig:
 
     def test_valid_config_all_fields(self):
         """Test valid fairness config with all fields provided."""
-        config = FairnessConfig(
-            demographic_parity_threshold=0.05,
-            equal_opportunity_threshold=0.08
-        )
+        config = FairnessConfig(demographic_parity_threshold=0.05, equal_opportunity_threshold=0.08)
 
         assert config.demographic_parity_threshold == 0.05
         assert config.equal_opportunity_threshold == 0.08
@@ -163,29 +151,20 @@ class TestFairnessConfig:
 
     def test_zero_thresholds(self):
         """Test that zero thresholds are valid."""
-        config = FairnessConfig(
-            demographic_parity_threshold=0.0,
-            equal_opportunity_threshold=0.0
-        )
+        config = FairnessConfig(demographic_parity_threshold=0.0, equal_opportunity_threshold=0.0)
         assert config.demographic_parity_threshold == 0.0
         assert config.equal_opportunity_threshold == 0.0
 
     def test_threshold_as_integer(self):
         """Test that integer thresholds are converted to float."""
-        config = FairnessConfig(
-            demographic_parity_threshold=1,
-            equal_opportunity_threshold=0
-        )
+        config = FairnessConfig(demographic_parity_threshold=1, equal_opportunity_threshold=0)
         assert config.demographic_parity_threshold == 1.0
         assert config.equal_opportunity_threshold == 0.0
         assert isinstance(config.demographic_parity_threshold, float)
 
     def test_high_thresholds(self):
         """Test high threshold values."""
-        config = FairnessConfig(
-            demographic_parity_threshold=0.5,
-            equal_opportunity_threshold=1.0
-        )
+        config = FairnessConfig(demographic_parity_threshold=0.5, equal_opportunity_threshold=1.0)
         assert config.demographic_parity_threshold == 0.5
         assert config.equal_opportunity_threshold == 1.0
 
@@ -195,11 +174,7 @@ class TestConfig:
 
     def test_valid_complete_config(self, endpoint_config, dataset_config, fairness_config):
         """Test valid complete configuration."""
-        config = Config(
-            endpoint=endpoint_config,
-            dataset=dataset_config,
-            fairness=fairness_config
-        )
+        config = Config(endpoint=endpoint_config, dataset=dataset_config, fairness=fairness_config)
 
         assert config.endpoint == endpoint_config
         assert config.dataset == dataset_config
@@ -207,10 +182,7 @@ class TestConfig:
 
     def test_fairness_defaults_applied(self, endpoint_config, dataset_config):
         """Test that fairness config defaults are applied if not provided."""
-        config = Config(
-            endpoint=endpoint_config,
-            dataset=dataset_config
-        )
+        config = Config(endpoint=endpoint_config, dataset=dataset_config)
 
         assert config.fairness.demographic_parity_threshold == 0.1
         assert config.fairness.equal_opportunity_threshold == 0.1
@@ -228,22 +200,14 @@ class TestConfig:
     def test_config_from_dict(self):
         """Test creating config from dictionary."""
         config_dict = {
-            'endpoint': {
-                'url': 'http://test.com/api',
-                'method': 'POST'
-            },
-            'dataset': {
-                'path': 'data.csv'
-            },
-            'fairness': {
-                'demographic_parity_threshold': 0.15,
-                'equal_opportunity_threshold': 0.12
-            }
+            "endpoint": {"url": "http://test.com/api", "method": "POST"},
+            "dataset": {"path": "data.csv"},
+            "fairness": {"demographic_parity_threshold": 0.15, "equal_opportunity_threshold": 0.12},
         }
 
         config = Config(**config_dict)
-        assert config.endpoint.url == 'http://test.com/api'
-        assert config.dataset.path == 'data.csv'
+        assert config.endpoint.url == "http://test.com/api"
+        assert config.dataset.path == "data.csv"
         assert config.fairness.demographic_parity_threshold == 0.15
 
 
@@ -286,11 +250,7 @@ class TestLoadConfig:
     def test_missing_required_field_endpoint(self, tmp_path):
         """Test that missing required endpoint field raises error."""
         config_path = tmp_path / "config.yaml"
-        config_data = {
-            'dataset': {
-                'path': 'data.csv'
-            }
-        }
+        config_data = {"dataset": {"path": "data.csv"}}
         config_path.write_text(yaml.dump(config_data))
 
         with pytest.raises(ParserError, match="Invalid configuration"):
@@ -299,11 +259,7 @@ class TestLoadConfig:
     def test_missing_required_field_dataset(self, tmp_path):
         """Test that missing required dataset field raises error."""
         config_path = tmp_path / "config.yaml"
-        config_data = {
-            'endpoint': {
-                'url': 'http://test.com/api'
-            }
-        }
+        config_data = {"endpoint": {"url": "http://test.com/api"}}
         config_path.write_text(yaml.dump(config_data))
 
         with pytest.raises(ParserError, match="Invalid configuration"):
@@ -312,14 +268,7 @@ class TestLoadConfig:
     def test_missing_url_in_endpoint(self, tmp_path):
         """Test that missing URL in endpoint section raises error."""
         config_path = tmp_path / "config.yaml"
-        config_data = {
-            'endpoint': {
-                'method': 'POST'
-            },
-            'dataset': {
-                'path': 'data.csv'
-            }
-        }
+        config_data = {"endpoint": {"method": "POST"}, "dataset": {"path": "data.csv"}}
         config_path.write_text(yaml.dump(config_data))
 
         with pytest.raises(ParserError, match="Invalid configuration"):
@@ -328,15 +277,7 @@ class TestLoadConfig:
     def test_invalid_http_method_in_yaml(self, tmp_path):
         """Test that invalid HTTP method in YAML raises error."""
         config_path = tmp_path / "config.yaml"
-        config_data = {
-            'endpoint': {
-                'url': 'http://test.com/api',
-                'method': 'DELETE'
-            },
-            'dataset': {
-                'path': 'data.csv'
-            }
-        }
+        config_data = {"endpoint": {"url": "http://test.com/api", "method": "DELETE"}, "dataset": {"path": "data.csv"}}
         config_path.write_text(yaml.dump(config_data))
 
         with pytest.raises(ParserError, match="Invalid configuration"):
@@ -346,36 +287,23 @@ class TestLoadConfig:
         """Test that extra fields in YAML are ignored by Pydantic."""
         config_path = tmp_path / "config.yaml"
         config_data = {
-            'endpoint': {
-                'url': 'http://test.com/api',
-                'extra_field': 'should be ignored'
-            },
-            'dataset': {
-                'path': 'data.csv',
-                'unknown_field': 123
-            },
-            'unknown_section': {
-                'foo': 'bar'
-            }
+            "endpoint": {"url": "http://test.com/api", "extra_field": "should be ignored"},
+            "dataset": {"path": "data.csv", "unknown_field": 123},
+            "unknown_section": {"foo": "bar"},
         }
         config_path.write_text(yaml.dump(config_data))
 
         # Should load successfully, extra fields ignored
         config = load_config(config_path)
-        assert config.endpoint.url == 'http://test.com/api'
-        assert config.dataset.path == 'data.csv'
+        assert config.endpoint.url == "http://test.com/api"
+        assert config.dataset.path == "data.csv"
 
     def test_invalid_type_for_timeout(self, tmp_path):
         """Test that invalid type for timeout raises error."""
         config_path = tmp_path / "config.yaml"
         config_data = {
-            'endpoint': {
-                'url': 'http://test.com/api',
-                'timeout': 'not-a-number'
-            },
-            'dataset': {
-                'path': 'data.csv'
-            }
+            "endpoint": {"url": "http://test.com/api", "timeout": "not-a-number"},
+            "dataset": {"path": "data.csv"},
         }
         config_path.write_text(yaml.dump(config_data))
 
@@ -386,15 +314,9 @@ class TestLoadConfig:
         """Test that invalid type for fairness threshold raises error."""
         config_path = tmp_path / "config.yaml"
         config_data = {
-            'endpoint': {
-                'url': 'http://test.com/api'
-            },
-            'dataset': {
-                'path': 'data.csv'
-            },
-            'fairness': {
-                'demographic_parity_threshold': 'invalid'
-            }
+            "endpoint": {"url": "http://test.com/api"},
+            "dataset": {"path": "data.csv"},
+            "fairness": {"demographic_parity_threshold": "invalid"},
         }
         config_path.write_text(yaml.dump(config_data))
 
@@ -405,51 +327,34 @@ class TestLoadConfig:
         """Test loading config with authentication token."""
         config_path = tmp_path / "config.yaml"
         config_data = {
-            'endpoint': {
-                'url': 'http://test.com/api',
-                'auth_token': 'secret-token-123'
-            },
-            'dataset': {
-                'path': 'data.csv'
-            }
+            "endpoint": {"url": "http://test.com/api", "auth_token": "secret-token-123"},
+            "dataset": {"path": "data.csv"},
         }
         config_path.write_text(yaml.dump(config_data))
 
         config = load_config(config_path)
-        assert config.endpoint.auth_token == 'secret-token-123'
+        assert config.endpoint.auth_token == "secret-token-123"
 
     def test_load_with_custom_headers(self, tmp_path):
         """Test loading config with custom headers."""
         config_path = tmp_path / "config.yaml"
         config_data = {
-            'endpoint': {
-                'url': 'http://test.com/api',
-                'headers': {
-                    'Content-Type': 'application/json',
-                    'X-Custom-Header': 'value'
-                }
+            "endpoint": {
+                "url": "http://test.com/api",
+                "headers": {"Content-Type": "application/json", "X-Custom-Header": "value"},
             },
-            'dataset': {
-                'path': 'data.csv'
-            }
+            "dataset": {"path": "data.csv"},
         }
         config_path.write_text(yaml.dump(config_data))
 
         config = load_config(config_path)
-        assert config.endpoint.headers['Content-Type'] == 'application/json'
-        assert config.endpoint.headers['X-Custom-Header'] == 'value'
+        assert config.endpoint.headers["Content-Type"] == "application/json"
+        assert config.endpoint.headers["X-Custom-Header"] == "value"
 
     def test_load_minimal_config(self, tmp_path):
         """Test loading minimal valid configuration."""
         config_path = tmp_path / "config.yaml"
-        config_data = {
-            'endpoint': {
-                'url': 'http://test.com/api'
-            },
-            'dataset': {
-                'path': 'data.csv'
-            }
-        }
+        config_data = {"endpoint": {"url": "http://test.com/api"}, "dataset": {"path": "data.csv"}}
         config_path.write_text(yaml.dump(config_data))
 
         config = load_config(config_path)

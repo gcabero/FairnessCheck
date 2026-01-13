@@ -5,9 +5,7 @@ Utility functions for fairness calculations.
 import numpy as np
 
 
-def calculate_demographic_parity_difference(
-    y_pred: np.ndarray, sensitive_features: np.ndarray
-) -> float:
+def calculate_demographic_parity_difference(y_pred: np.ndarray, sensitive_features: np.ndarray) -> float:
     """
     Calculate demographic parity difference.
 

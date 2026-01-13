@@ -60,10 +60,7 @@ class TestSetupLogging:
         root_logger = logging.getLogger()
         # Check that at least one handler outputs to stdout
         handlers = root_logger.handlers
-        assert any(
-            hasattr(handler, 'stream') and handler.stream == sys.stdout
-            for handler in handlers
-        )
+        assert any(hasattr(handler, "stream") and handler.stream == sys.stdout for handler in handlers)
 
     def test_logging_format_simple(self):
         """Test that logging uses simple format without timestamps."""
@@ -85,13 +82,13 @@ class TestMainValidate:
 
     def test_validate_valid_config(self, temp_config_yaml, monkeypatch, capsys):
         """Test validate command with valid config file."""
-        monkeypatch.setattr(sys, 'argv', ['fairness-check', 'validate', str(temp_config_yaml)])
+        monkeypatch.setattr(sys, "argv", ["fairness-check", "validate", str(temp_config_yaml)])
 
-        with patch('fairness_check.fairness_check_cmd.load_config') as mock_load:
+        with patch("fairness_check.fairness_check_cmd.load_config") as mock_load:
             from fairness_check.config import Config, EndpointConfig, DatasetConfig
+
             mock_config = Config(
-                endpoint=EndpointConfig(url="http://test.com/api"),
-                dataset=DatasetConfig(path="data.csv")
+                endpoint=EndpointConfig(url="http://test.com/api"), dataset=DatasetConfig(path="data.csv")
             )
             mock_load.return_value = mock_config
 
@@ -105,9 +102,9 @@ class TestMainValidate:
 
     def test_validate_file_not_found(self, monkeypatch, capsys):
         """Test validate command with non-existent config file."""
-        monkeypatch.setattr(sys, 'argv', ['fairness-check', 'validate', 'nonexistent.yaml'])
+        monkeypatch.setattr(sys, "argv", ["fairness-check", "validate", "nonexistent.yaml"])
 
-        with patch('fairness_check.fairness_check_cmd.load_config') as mock_load:
+        with patch("fairness_check.fairness_check_cmd.load_config") as mock_load:
             mock_load.side_effect = FileNotFoundError("Configuration file not found")
 
             with pytest.raises(SystemExit) as exc_info:
@@ -117,9 +114,9 @@ class TestMainValidate:
 
     def test_validate_invalid_config(self, monkeypatch, capsys):
         """Test validate command with invalid config file."""
-        monkeypatch.setattr(sys, 'argv', ['fairness-check', 'validate', 'invalid.yaml'])
+        monkeypatch.setattr(sys, "argv", ["fairness-check", "validate", "invalid.yaml"])
 
-        with patch('fairness_check.fairness_check_cmd.load_config') as mock_load:
+        with patch("fairness_check.fairness_check_cmd.load_config") as mock_load:
             mock_load.side_effect = ValueError("Invalid configuration")
 
             with pytest.raises(SystemExit) as exc_info:
@@ -133,34 +130,27 @@ class TestMainReport:
 
     def test_report_basic(self, temp_config_yaml, monkeypatch, capsys):
         """Test report command with basic configuration."""
-        monkeypatch.setattr(sys, 'argv', ['fairness-check', 'report', str(temp_config_yaml)])
+        monkeypatch.setattr(sys, "argv", ["fairness-check", "report", str(temp_config_yaml)])
 
         from fairness_check.config import Config, EndpointConfig, DatasetConfig, FairnessConfig
 
-        with patch('fairness_check.fairness_check_cmd.load_config') as mock_load, \
-             patch('fairness_check.fairness_check_cmd.run_fairness_check') as mock_run:
+        with (
+            patch("fairness_check.fairness_check_cmd.load_config") as mock_load,
+            patch("fairness_check.fairness_check_cmd.run_fairness_check") as mock_run,
+        ):
 
             mock_config = Config(
                 endpoint=EndpointConfig(url="http://test.com/api"),
                 dataset=DatasetConfig(path="data.csv"),
-                fairness=FairnessConfig(
-                    demographic_parity_threshold=0.1,
-                    equal_opportunity_threshold=0.1
-                )
+                fairness=FairnessConfig(demographic_parity_threshold=0.1, equal_opportunity_threshold=0.1),
             )
             mock_load.return_value = mock_config
 
             mock_run.return_value = {
-                'total_predictions': 100,
-                'accuracy': 0.85,
-                'fairness_metrics': {
-                    'demographic_parity_difference': 0.05,
-                    'equal_opportunity_difference': 0.03
-                },
-                'thresholds_met': {
-                    'demographic_parity': True,
-                    'equal_opportunity': True
-                }
+                "total_predictions": 100,
+                "accuracy": 0.85,
+                "fairness_metrics": {"demographic_parity_difference": 0.05, "equal_opportunity_difference": 0.03},
+                "thresholds_met": {"demographic_parity": True, "equal_opportunity": True},
             }
 
             main()
@@ -174,66 +164,61 @@ class TestMainReport:
 
     def test_report_with_verbose_flag(self, temp_config_yaml, monkeypatch, capsys):
         """Test report command with --verbose flag."""
-        monkeypatch.setattr(sys, 'argv', ['fairness-check', 'report', str(temp_config_yaml), '--verbose'])
+        monkeypatch.setattr(sys, "argv", ["fairness-check", "report", str(temp_config_yaml), "--verbose"])
 
         from fairness_check.config import Config, EndpointConfig, DatasetConfig, FairnessConfig
 
-        with patch('fairness_check.fairness_check_cmd.load_config') as mock_load, \
-             patch('fairness_check.fairness_check_cmd.run_fairness_check') as mock_run:
+        with (
+            patch("fairness_check.fairness_check_cmd.load_config") as mock_load,
+            patch("fairness_check.fairness_check_cmd.run_fairness_check") as mock_run,
+        ):
 
             mock_config = Config(
                 endpoint=EndpointConfig(url="http://test.com/api"),
                 dataset=DatasetConfig(path="data.csv"),
-                fairness=FairnessConfig()
+                fairness=FairnessConfig(),
             )
             mock_load.return_value = mock_config
 
             mock_run.return_value = {
-                'total_predictions': 50,
-                'accuracy': 0.90,
-                'fairness_metrics': {
-                    'demographic_parity_difference': 0.02,
-                    'equal_opportunity_difference': 0.01
-                },
-                'thresholds_met': {
-                    'demographic_parity': True,
-                    'equal_opportunity': True
-                }
+                "total_predictions": 50,
+                "accuracy": 0.90,
+                "fairness_metrics": {"demographic_parity_difference": 0.02, "equal_opportunity_difference": 0.01},
+                "thresholds_met": {"demographic_parity": True, "equal_opportunity": True},
             }
 
             main()
 
             # Verify run_fairness_check was called with verbose=True
             mock_run.assert_called_once()
-            assert mock_run.call_args[1]['verbose'] is True
+            assert mock_run.call_args[1]["verbose"] is True
 
     def test_report_threshold_exceeded_demographic_parity(self, temp_config_yaml, monkeypatch, capsys):
         """Test report when demographic parity threshold is exceeded."""
-        monkeypatch.setattr(sys, 'argv', ['fairness-check', 'report', str(temp_config_yaml)])
+        monkeypatch.setattr(sys, "argv", ["fairness-check", "report", str(temp_config_yaml)])
 
         from fairness_check.config import Config, EndpointConfig, DatasetConfig, FairnessConfig
 
-        with patch('fairness_check.fairness_check_cmd.load_config') as mock_load, \
-             patch('fairness_check.fairness_check_cmd.run_fairness_check') as mock_run:
+        with (
+            patch("fairness_check.fairness_check_cmd.load_config") as mock_load,
+            patch("fairness_check.fairness_check_cmd.run_fairness_check") as mock_run,
+        ):
 
             mock_config = Config(
                 endpoint=EndpointConfig(url="http://test.com/api"),
                 dataset=DatasetConfig(path="data.csv"),
-                fairness=FairnessConfig(demographic_parity_threshold=0.1)
+                fairness=FairnessConfig(demographic_parity_threshold=0.1),
             )
             mock_load.return_value = mock_config
 
             mock_run.return_value = {
-                'total_predictions': 100,
-                'accuracy': 0.80,
-                'fairness_metrics': {
-                    'demographic_parity_difference': 0.25,  # Exceeds threshold
-                    'equal_opportunity_difference': 0.05
+                "total_predictions": 100,
+                "accuracy": 0.80,
+                "fairness_metrics": {
+                    "demographic_parity_difference": 0.25,  # Exceeds threshold
+                    "equal_opportunity_difference": 0.05,
                 },
-                'thresholds_met': {
-                    'demographic_parity': False,
-                    'equal_opportunity': True
-                }
+                "thresholds_met": {"demographic_parity": False, "equal_opportunity": True},
             }
 
             main()
@@ -244,31 +229,30 @@ class TestMainReport:
 
     def test_report_threshold_exceeded_equal_opportunity(self, temp_config_yaml, monkeypatch, capsys):
         """Test report when equal opportunity threshold is exceeded."""
-        monkeypatch.setattr(sys, 'argv', ['fairness-check', 'report', str(temp_config_yaml)])
+        monkeypatch.setattr(sys, "argv", ["fairness-check", "report", str(temp_config_yaml)])
 
         from fairness_check.config import Config, EndpointConfig, DatasetConfig, FairnessConfig
 
-        with patch('fairness_check.fairness_check_cmd.load_config') as mock_load, \
-             patch('fairness_check.fairness_check_cmd.run_fairness_check') as mock_run:
+        with (
+            patch("fairness_check.fairness_check_cmd.load_config") as mock_load,
+            patch("fairness_check.fairness_check_cmd.run_fairness_check") as mock_run,
+        ):
 
             mock_config = Config(
                 endpoint=EndpointConfig(url="http://test.com/api"),
                 dataset=DatasetConfig(path="data.csv"),
-                fairness=FairnessConfig(equal_opportunity_threshold=0.1)
+                fairness=FairnessConfig(equal_opportunity_threshold=0.1),
             )
             mock_load.return_value = mock_config
 
             mock_run.return_value = {
-                'total_predictions': 100,
-                'accuracy': 0.75,
-                'fairness_metrics': {
-                    'demographic_parity_difference': 0.05,
-                    'equal_opportunity_difference': 0.20  # Exceeds threshold
+                "total_predictions": 100,
+                "accuracy": 0.75,
+                "fairness_metrics": {
+                    "demographic_parity_difference": 0.05,
+                    "equal_opportunity_difference": 0.20,  # Exceeds threshold
                 },
-                'thresholds_met': {
-                    'demographic_parity': True,
-                    'equal_opportunity': False
-                }
+                "thresholds_met": {"demographic_parity": True, "equal_opportunity": False},
             }
 
             main()
@@ -280,31 +264,27 @@ class TestMainReport:
 
     def test_report_thresholds_met(self, temp_config_yaml, monkeypatch, capsys):
         """Test report when all thresholds are met."""
-        monkeypatch.setattr(sys, 'argv', ['fairness-check', 'report', str(temp_config_yaml)])
+        monkeypatch.setattr(sys, "argv", ["fairness-check", "report", str(temp_config_yaml)])
 
         from fairness_check.config import Config, EndpointConfig, DatasetConfig, FairnessConfig
 
-        with patch('fairness_check.fairness_check_cmd.load_config') as mock_load, \
-             patch('fairness_check.fairness_check_cmd.run_fairness_check') as mock_run:
+        with (
+            patch("fairness_check.fairness_check_cmd.load_config") as mock_load,
+            patch("fairness_check.fairness_check_cmd.run_fairness_check") as mock_run,
+        ):
 
             mock_config = Config(
                 endpoint=EndpointConfig(url="http://test.com/api"),
                 dataset=DatasetConfig(path="data.csv"),
-                fairness=FairnessConfig()
+                fairness=FairnessConfig(),
             )
             mock_load.return_value = mock_config
 
             mock_run.return_value = {
-                'total_predictions': 100,
-                'accuracy': 0.88,
-                'fairness_metrics': {
-                    'demographic_parity_difference': 0.02,
-                    'equal_opportunity_difference': 0.03
-                },
-                'thresholds_met': {
-                    'demographic_parity': True,
-                    'equal_opportunity': True
-                }
+                "total_predictions": 100,
+                "accuracy": 0.88,
+                "fairness_metrics": {"demographic_parity_difference": 0.02, "equal_opportunity_difference": 0.03},
+                "thresholds_met": {"demographic_parity": True, "equal_opportunity": True},
             }
 
             main()
@@ -314,9 +294,9 @@ class TestMainReport:
 
     def test_report_file_not_found(self, monkeypatch):
         """Test report command with non-existent config file."""
-        monkeypatch.setattr(sys, 'argv', ['fairness-check', 'report', 'nonexistent.yaml'])
+        monkeypatch.setattr(sys, "argv", ["fairness-check", "report", "nonexistent.yaml"])
 
-        with patch('fairness_check.fairness_check_cmd.load_config') as mock_load:
+        with patch("fairness_check.fairness_check_cmd.load_config") as mock_load:
             mock_load.side_effect = FileNotFoundError("Configuration file not found")
 
             with pytest.raises(SystemExit) as exc_info:
@@ -326,16 +306,17 @@ class TestMainReport:
 
     def test_report_runtime_error(self, temp_config_yaml, monkeypatch):
         """Test report command with runtime error."""
-        monkeypatch.setattr(sys, 'argv', ['fairness-check', 'report', str(temp_config_yaml)])
+        monkeypatch.setattr(sys, "argv", ["fairness-check", "report", str(temp_config_yaml)])
 
         from fairness_check.config import Config, EndpointConfig, DatasetConfig
 
-        with patch('fairness_check.fairness_check_cmd.load_config') as mock_load, \
-             patch('fairness_check.fairness_check_cmd.run_fairness_check') as mock_run:
+        with (
+            patch("fairness_check.fairness_check_cmd.load_config") as mock_load,
+            patch("fairness_check.fairness_check_cmd.run_fairness_check") as mock_run,
+        ):
 
             mock_config = Config(
-                endpoint=EndpointConfig(url="http://test.com/api"),
-                dataset=DatasetConfig(path="data.csv")
+                endpoint=EndpointConfig(url="http://test.com/api"), dataset=DatasetConfig(path="data.csv")
             )
             mock_load.return_value = mock_config
             mock_run.side_effect = RuntimeError("API connection failed")
@@ -347,16 +328,17 @@ class TestMainReport:
 
     def test_report_runtime_error_with_verbose_raises(self, temp_config_yaml, monkeypatch):
         """Test that runtime error with --verbose re-raises the exception."""
-        monkeypatch.setattr(sys, 'argv', ['fairness-check', 'report', str(temp_config_yaml), '--verbose'])
+        monkeypatch.setattr(sys, "argv", ["fairness-check", "report", str(temp_config_yaml), "--verbose"])
 
         from fairness_check.config import Config, EndpointConfig, DatasetConfig
 
-        with patch('fairness_check.fairness_check_cmd.load_config') as mock_load, \
-             patch('fairness_check.fairness_check_cmd.run_fairness_check') as mock_run:
+        with (
+            patch("fairness_check.fairness_check_cmd.load_config") as mock_load,
+            patch("fairness_check.fairness_check_cmd.run_fairness_check") as mock_run,
+        ):
 
             mock_config = Config(
-                endpoint=EndpointConfig(url="http://test.com/api"),
-                dataset=DatasetConfig(path="data.csv")
+                endpoint=EndpointConfig(url="http://test.com/api"), dataset=DatasetConfig(path="data.csv")
             )
             mock_load.return_value = mock_config
             mock_run.side_effect = RuntimeError("API connection failed")
@@ -371,7 +353,7 @@ class TestMainVersion:
 
     def test_version_flag(self, monkeypatch, capsys):
         """Test --version flag displays version."""
-        monkeypatch.setattr(sys, 'argv', ['fairness-check', '--version'])
+        monkeypatch.setattr(sys, "argv", ["fairness-check", "--version"])
 
         with pytest.raises(SystemExit) as exc_info:
             main()
@@ -386,7 +368,7 @@ class TestMainHelp:
 
     def test_help_flag(self, monkeypatch):
         """Test --help flag displays help message."""
-        monkeypatch.setattr(sys, 'argv', ['fairness-check', '--help'])
+        monkeypatch.setattr(sys, "argv", ["fairness-check", "--help"])
 
         with pytest.raises(SystemExit) as exc_info:
             main()
@@ -400,21 +382,21 @@ class TestMainEdgeCases:
 
     def test_no_command_provided(self, monkeypatch):
         """Test that providing no command shows help."""
-        monkeypatch.setattr(sys, 'argv', ['fairness-check'])
+        monkeypatch.setattr(sys, "argv", ["fairness-check"])
 
         with pytest.raises(SystemExit):
             main()
 
     def test_invalid_command(self, monkeypatch):
         """Test that invalid command shows error."""
-        monkeypatch.setattr(sys, 'argv', ['fairness-check', 'invalid-command', 'config.yaml'])
+        monkeypatch.setattr(sys, "argv", ["fairness-check", "invalid-command", "config.yaml"])
 
         with pytest.raises(SystemExit):
             main()
 
     def test_report_without_config_file(self, monkeypatch):
         """Test report command without config file argument."""
-        monkeypatch.setattr(sys, 'argv', ['fairness-check', 'report'])
+        monkeypatch.setattr(sys, "argv", ["fairness-check", "report"])
 
         with pytest.raises(SystemExit):
             main()
