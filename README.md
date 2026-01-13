@@ -354,54 +354,27 @@ uv run black src/ tests/
 
 ## GitHub Workflows
 
-The project includes automated GitHub Actions workflows for CI/CD.
-
-### Docker Image Publishing (`docker-publish.yml`)
-
-Automatically builds and publishes Docker images to GitHub Container Registry (GHCR).
-
-**Triggers:**
-- **Push to main/master**: Builds and tags as `latest`
-- **Git tags** (e.g., `v1.0.0`): Builds and tags with version numbers
-- **Pull requests**: Builds but doesn't publish (for testing)
-- **Manual dispatch**: Can be triggered manually from GitHub Actions tab
-
-**Available Tags:**
-- `latest` - Latest stable version from main branch
-- `v1.0.0` - Specific version tag
-- `v1.0` - Major.minor version
-- `v1` - Major version only
-
-**Publishing a New Version:**
-
-```bash
-# Tag a new version
-git tag v1.0.0
-git push origin v1.0.0
-
-# GitHub Actions automatically builds and pushes to:
-# - ghcr.io/gcabero/fairness-check:v1.0.0
-# - ghcr.io/gcabero/fairness-check:v1.0
-# - ghcr.io/gcabero/fairness-check:v1
-# - ghcr.io/gcabero/fairness-check:latest
-```
-
-**Making Images Public:**
-
-By default, GHCR images are private. To make public:
-1. Go to repository → "Packages" (right sidebar)
-2. Select `fairness-check` package
-3. Click "Package settings"
-4. Under "Danger Zone" → "Change visibility" → "Public"
+The project includes automated GitHub  workflows for CI/CD.  
+TODO: It still needs to configure the actions to hook them and trigger them on every commit
 
 ### Code Quality Checks (`code-quality.yml`)
 
-Runs Black formatting checks on every push and pull request.
+Ideally run them before pushing
+
+## Formatting
 
 ```bash
-# Locally format code before pushing
+
 uv run black src/ tests/
 ```
+## Vulnerability Scanning
+
+```bash
+# Locally scan for vulnerabilities
+uv run pip-audit check
+```
+
+TODO: include static analysis tool
 
 ### Automated Tests (`test.yml`)
 
@@ -418,7 +391,7 @@ uv run pytest tests/ -v
 
 ```bash
 # Fork and clone the repository
-git clone https://github.com/yourusername/fairness-check.git
+git clone https://github.com/gcabero/fairness-check.git
 cd fairness-check
 
 # Install with dev dependencies
@@ -438,63 +411,14 @@ uv pip install -e .
 ### Pull Request Process
 
 1. **Create a feature branch**
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-
 2. **Make your changes**
    - Write clean, documented code
    - Add tests for new functionality
    - Update documentation as needed
-
 3. **Run quality checks**
-   ```bash
-   uv run black src/ tests/
-   uv run pytest tests/ -v --cov=fairness_check
-   ```
-
 4. **Commit your changes**
-   ```bash
-   git add .
-   git commit -m "feat: add your feature description"
-   ```
-
-   Use [Conventional Commits](https://www.conventionalcommits.org/):
-   - `feat:` for new features
-   - `fix:` for bug fixes
-   - `docs:` for documentation changes
-   - `test:` for test additions/changes
-
-5. **Push and create PR**
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-
-### Testing Requirements
-
-- Write tests for all new features
-- Maintain coverage >90%
-- Test edge cases and error conditions
-- Use pytest fixtures for common test data
-
-## Deploying to the Cloud
-
-The Docker image can be deployed to any cloud platform that supports containers. The image is available at `ghcr.io/gcabero/fairness-check:latest` and can be pulled and run anywhere.
-
-Example deployment using Docker:
-
-```bash
-# Pull the image
-docker pull ghcr.io/gcabero/fairness-check:latest
-
-# Run with your config and data
-docker run --rm \
-  -v /path/to/your/config.yaml:/app/config.yaml:ro \
-  -v /path/to/your/data:/app/data:ro \
-  ghcr.io/gcabero/fairness-check:latest report config.yaml --verbose
-```
-
-The containerized tool can be integrated into your cloud infrastructure, CI/CD pipelines, or scheduled jobs for automated fairness testing.
+5. **Push to your fork**
+6. **Open a Pull Request** against the `main` branch of the original repository
 
 ## References
 

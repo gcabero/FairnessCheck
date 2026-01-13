@@ -26,3 +26,6 @@ jobs:
 
       - name: Check formatting with Black
         run: uv run black --check src/
+
+      - name: Check security with pip-audit
+        run: uv run pip-audit

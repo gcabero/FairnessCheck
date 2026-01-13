@@ -49,6 +49,7 @@ dev = [
     "flask>=2.2.5",
     "fairlearn>=0.10.0",
     "scikit-learn>=1.3.0",
+    "pip-audit>=2.6.0",
 ]
 
 docs = [

@@ -17,7 +17,8 @@ endpoint:
   # Request timeout in seconds
   timeout: 30
 
-  # Authentication token (optional)
+  # Authentication token (optional) -
+  #  Important note: Ideally this should be passed through secrets rather than print it in a config file
   # auth_token: "your-api-token-here"
 
 # Test dataset configuration
