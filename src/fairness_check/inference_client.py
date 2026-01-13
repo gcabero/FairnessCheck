@@ -2,12 +2,15 @@
 Client for interacting with classifier endpoints.
 """
 
+import logging
 from typing import Any
 
 import requests
 from pydantic import BaseModel, Field, field_validator, ValidationError
 
 from fairness_check.config import EndpointConfig
+
+logger = logging.getLogger(__name__)
 
 
 class InferenceRequest(BaseModel):
@@ -73,6 +76,12 @@ class InferenceClient:
         if config.auth_token:
             self.session.headers["Authorization"] = f"Bearer {config.auth_token}"
 
+        logger.info(f"Initialized InferenceClient for {config.method} {config.url}")
+        logger.debug(f"  Timeout: {config.timeout}s")
+        logger.debug(f"  Headers: {dict(config.headers)}")
+        if config.auth_token:
+            logger.debug("  Authentication: Bearer token configured")
+
     def infer(self, api_input: Any) -> int:
         """
         Get the prediction or inference from a/an ML/AI system that's exposed via a
@@ -100,6 +109,9 @@ class InferenceClient:
             request = InferenceRequest(features=api_input)
             payload = request.model_dump()
 
+            logger.debug(f"Making {self.config.method} request to {self.config.url}")
+            logger.debug(f"  Request payload: {payload}")
+
             # Make HTTP request
             if self.config.method == "POST":
                 response = self.session.post(
@@ -116,29 +128,40 @@ class InferenceClient:
 
             response.raise_for_status()
 
+            logger.debug(f"Received response: status={response.status_code}")
+            logger.debug(f"  Response body: {response.text}")
+
             # Parse and validate response using Pydantic
             response_data = response.json()
             inference_response = InferenceResponse(**response_data)
 
+            logger.debug(f"Successfully validated response: inference={inference_response.inference}")
+
             return inference_response.inference
 
         except requests.RequestException as e:
+            logger.error(f"HTTP request failed: {e}")
             raise RuntimeError(f"Failed to get inference from endpoint: {e}")
         except ValidationError as e:
             # Pydantic validation error - provide clear message
+            logger.error(f"Response validation failed: {e.errors()}")
             raise RuntimeError(f"Invalid response from endpoint: {e.errors()}")
         except ValueError as e:
             # JSON parsing or other value errors
+            logger.error(f"Response parsing failed: {e}")
             raise RuntimeError(f"Failed to parse response: {e}")
 
     def close(self) -> None:
         """Close the session."""
+        logger.debug("Closing InferenceClient session")
         self.session.close()
 
     def __enter__(self) -> "InferenceClient":
         """Context manager entry."""
+        logger.debug("Entering InferenceClient context manager")
         return self
 
     def __exit__(self, *args: Any) -> None:
         """Context manager exit."""
+        logger.debug("Exiting InferenceClient context manager")
         self.close()
