@@ -165,7 +165,7 @@ Your classifier endpoint must:
 **Return** a JSON response with either format:
 ```json
 {
-  "prediction": 1  // oe 0, or class segment 
+  "inference": 1   
 }
 ```
 
@@ -342,7 +342,8 @@ uv sync --all-extras
 uv run pytest tests/ -v
 
 # Run with coverage
-uv run pytest tests/ -v --cov=fairness_check --cov-report=term-missing
+uv run pytest tests/ -v --cov=fairness_check 
+
 
 # Run specific test file
 uv run pytest tests/test_metrics.py -v

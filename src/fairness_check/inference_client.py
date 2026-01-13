@@ -5,8 +5,52 @@ Client for interacting with classifier endpoints.
 from typing import Any
 
 import requests
+from pydantic import BaseModel, Field, field_validator, ValidationError
 
 from fairness_check.config import EndpointConfig
+
+
+class InferenceRequest(BaseModel):
+    """Request payload for inference endpoint."""
+
+    features: Any = Field(
+        ...,
+        description="Input features for inference (str, dict, list, or any JSON-serializable object)",
+    )
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {"features": "user_id_123"},
+                {"features": {"age": 25, "income": 50000}},
+                {"features": [1.0, 2.0, 3.0]},
+            ]
+        }
+    }
+
+
+class InferenceResponse(BaseModel):
+    """Response payload from inference endpoint."""
+
+    inference: int = Field(..., description="Predicted class/label (integer)")
+
+    @field_validator("inference", mode="before")
+    @classmethod
+    def validate_inference_is_int(cls, v: Any) -> int:
+        """Ensure inference value is an integer."""
+        if isinstance(v, float):
+            return int(v)
+        if isinstance(v, str):
+            # Try to convert string to int, let Pydantic handle the rest
+            try:
+                return int(v)
+            except ValueError:
+                raise ValueError(f"inference must be a valid integer string, got: {v}")
+        if not isinstance(v, int):
+            raise ValueError(f"inference must be an integer, got {type(v).__name__}: {v}")
+        return v
+
+    model_config = {"extra": "allow"}  # Allow extra fields in response (e.g., confidence, metadata)
 
 
 class InferenceClient:
@@ -36,51 +80,56 @@ class InferenceClient:
 
         Parameters
         ----------
-        api_input : Any. Ideally a json-serializable object.
+        api_input : Any
+            The input features to send to the AI system.
+            Ideally a json-serializable object (str, dict, list, etc.)
 
         Returns
         -------
         int
-            Predicted value (usually 0 or 1). Although it can be extended to be a
-            more complex output with maybe different subclasses depending on the
-             use case we want to apply the fairness check to.
+            The inference from the AI system. If we think of a classifier this could
+             be the predicted class/label.
 
         Raises
         ------
-        requests.RequestException
-            If the request fails.
-        ValueError/RuntimeError
-            If the response is invalid and cannot be parsed.
+        RuntimeError
+            If the request fails or response is invalid.
         """
-        payload = {"features": api_input}
-
         try:
+            # Create and validate request using Pydantic
+            request = InferenceRequest(features=api_input)
+            payload = request.model_dump()
+
+            # Make HTTP request
             if self.config.method == "POST":
                 response = self.session.post(
-                    self.config.url, json=payload, timeout=self.config.timeout
+                    self.config.url,
+                    json=payload,
+                    timeout=self.config.timeout,
                 )
             else:  # GET
                 response = self.session.get(
-                    self.config.url, params=payload, timeout=self.config.timeout
+                    self.config.url,
+                    params=payload,
+                    timeout=self.config.timeout,
                 )
 
             response.raise_for_status()
-            data = response.json()
 
-            # Extract inference from response
-            if "inference" in data:
-                return int(data["inference"])
-            elif "prediction" in data:
-                return int(data["prediction"])
-            elif "class" in data:
-                return int(data["class"])
-            else:
-                raise ValueError(f"Invalid response format: {data}")
+            # Parse and validate response using Pydantic
+            response_data = response.json()
+            inference_response = InferenceResponse(**response_data)
+
+            return inference_response.inference
 
         except requests.RequestException as e:
             raise RuntimeError(f"Failed to get inference from endpoint: {e}")
+        except ValidationError as e:
+            # Pydantic validation error - provide clear message
+            raise RuntimeError(f"Invalid response from endpoint: {e.errors()}")
         except ValueError as e:
-            raise RuntimeError(f"Invalid response format: {data}")
+            # JSON parsing or other value errors
+            raise RuntimeError(f"Failed to parse response: {e}")
 
     def close(self) -> None:
         """Close the session."""

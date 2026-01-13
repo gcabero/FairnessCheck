@@ -23,7 +23,7 @@ class ClassifyRequest(BaseModel):
 
 
 class ClassifyResponse(BaseModel):
-    prediction: int
+    inference: int
     features: Any
     note: str | None = None
 
@@ -65,13 +65,13 @@ async def classify(request: ClassifyRequest):
     Classify endpoint that returns random predictions.
 
     Expects JSON: {"features": <any_value>}
-    Returns JSON: {"prediction": 0 or 1}
+    Returns JSON: {"inference": 0 or 1}
     """
     # Return random binary prediction
-    prediction = random.choice([0, 1])
+    inference = random.choice([0, 1])
 
     return {
-        "prediction": prediction,
+        "inference": inference,
         "features": request.features
     }
 
@@ -82,13 +82,13 @@ async def classify_random(request: ClassifyRequest):
     Classify endpoint with random predictions (same as /classify).
 
     Expects JSON: {"features": <any_value>}
-    Returns JSON: {"prediction": 0 or 1}
+    Returns JSON: {"inference": 0 or 1}
     """
     # Return random binary prediction
-    prediction = random.choice([0, 1])
+    inference = random.choice([0, 1])
 
     return {
-        "prediction": prediction,
+        "inference": inference,
         "features": request.features
     }
 
@@ -103,7 +103,7 @@ async def classify_biased(request: ClassifyRequest):
     """
     # Always return positive class (1) - this is intentionally biased!
     return {
-        "prediction": 1,
+        "inference": 1,
         "features": request.features,
         "note": "This is an intentionally biased endpoint for testing"
     }
