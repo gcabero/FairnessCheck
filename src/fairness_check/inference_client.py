@@ -135,7 +135,7 @@ class InferenceClient:
             response_data = response.json()
             inference_response = InferenceResponse(**response_data)
 
-            logger.debug(f"Successfully validated response: inference={inference_response.inference}")
+            logger.info(f"Successfully validated response: inference={inference_response.inference}")
 
             return inference_response.inference
 
