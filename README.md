@@ -92,7 +92,13 @@ verify the installation:
 ```bash
 docker run --rm fairness-check:latest --version
 ```
-   
+or 
+
+```bash
+python verify_setup.py
+```
+
+
 ```bash
 ### Option 2: Local Installation from Source
 
