@@ -77,10 +77,6 @@ class InferenceClient:
             self.session.headers["Authorization"] = f"Bearer {config.auth_token}"
 
         logger.info(f"Initialized InferenceClient for {config.method} {config.url}")
-        logger.debug(f"  Timeout: {config.timeout}s")
-        logger.debug(f"  Headers: {dict(config.headers)}")
-        if config.auth_token:
-            logger.debug("  Authentication: Bearer token configured")
 
     def infer(self, api_input: Any) -> int:
         """
@@ -109,9 +105,6 @@ class InferenceClient:
             request = InferenceRequest(features=api_input)
             payload = request.model_dump()
 
-            logger.debug(f"Making {self.config.method} request to {self.config.url}")
-            logger.debug(f"  Request payload: {payload}")
-
             # Make HTTP request
             if self.config.method == "POST":
                 response = self.session.post(
@@ -128,14 +121,13 @@ class InferenceClient:
 
             response.raise_for_status()
 
-            logger.debug(f"Received response: status={response.status_code}")
-            logger.debug(f"  Response body: {response.text}")
-
             # Parse and validate response using Pydantic
             response_data = response.json()
             inference_response = InferenceResponse(**response_data)
 
-            logger.info(f"Successfully validated response: inference={inference_response.inference}")
+            logger.info(
+                f"Successfully validated response: inference={inference_response.inference}"
+            )
 
             return inference_response.inference
 
@@ -153,15 +145,12 @@ class InferenceClient:
 
     def close(self) -> None:
         """Close the session."""
-        logger.debug("Closing InferenceClient session")
         self.session.close()
 
     def __enter__(self) -> "InferenceClient":
         """Context manager entry."""
-        logger.debug("Entering InferenceClient context manager")
         return self
 
     def __exit__(self, *args: Any) -> None:
         """Context manager exit."""
-        logger.debug("Exiting InferenceClient context manager")
         self.close()

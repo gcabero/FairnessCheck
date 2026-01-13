@@ -72,10 +72,10 @@ def run_fairness_check(config: Config, verbose: bool = False) -> dict[str, Any]:
     sensitive_features = df[sensitive_col].values
 
     # Get answers from the AI system we want to evaluate fairness accross
-    y_pred = get_predictions(config, features_list)
+    y_pred = get_predictions(config, features_list, verbose)
 
     # Calculate fairness metrics
-    results = calculate_metrics(config, sensitive_features, y_pred, y_true)
+    results = calculate_metrics(config, sensitive_features, y_pred, y_true, verbose)
 
     return results
 

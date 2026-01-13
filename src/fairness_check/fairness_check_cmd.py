@@ -87,10 +87,10 @@ def main() -> None:
             # Check thresholds
             demographic_parity_threshold = config.fairness.demographic_parity_threshold
             logger.info(f"Equal opportunity threshold: {demographic_parity_threshold}")
-            if (
-                results["fairness_metrics"]["demographic_parity_difference"]
-                > demographic_parity_threshold
-            ):
+            demographic_parity_difference = results["fairness_metrics"][
+                "demographic_parity_difference"
+            ]
+            if demographic_parity_difference > demographic_parity_threshold:
                 print(
                     f"\n⚠️  Warning: Demographic parity difference exceeds {demographic_parity_threshold} threshold"
                 )
@@ -99,9 +99,10 @@ def main() -> None:
 
             equal_odds_threshold = config.fairness.equal_opportunity_threshold
             logger.info(f"Equal opportunity threshold: {equal_odds_threshold}")
-            if results["fairness_metrics"]["demographic_parity_difference"] > equal_odds_threshold:
+            equal_odds_difference = results["fairness_metrics"]["equal_opportunity_difference"]
+            if equal_odds_difference > equal_odds_threshold:
                 print(
-                    f"\n⚠️  Warning: Equal opportunity difference exceeds {demographic_parity_threshold} threshold"
+                    f"\n⚠️  Warning: Equal opportunity difference exceeds {equal_odds_threshold} threshold"
                 )
             else:
                 print("\n✓ Equal opportunity difference thresholds met")
