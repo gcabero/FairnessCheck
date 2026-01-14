@@ -49,6 +49,7 @@ venv.bak/
 # IDEs
 .vscode/
 .idea/
+*.iml
 .DS_Store
 
 # Config files (keep examples)
