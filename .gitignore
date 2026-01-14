@@ -59,3 +59,4 @@ config*.yaml
 # Data files (keep examples)
 data/*.csv
 !data/*.example.csv
+!data/gender_fairness_segment_cautious_dataset.csv
