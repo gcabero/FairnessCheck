@@ -429,6 +429,7 @@ uv pip install -e .
 
 - **Fairness Metrics**: [Fairlearn User Guide](https://fairlearn.org/main/user_guide/assessment/common_fairness_metrics.html)
 - **Test Datasets**: [UCI Adult Dataset](https://archive.ics.uci.edu/ml/datasets/adult)
+- **Other**: https://arxiv.org/html/2507.18561v1#bib.bib6
 
 ## License
 
