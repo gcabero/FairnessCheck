@@ -17,6 +17,11 @@ Fairness Check is a command-line tool designed to evaluate the fairness of AI sy
    - **Equal Opportunity Difference**: Measures if all groups with true positive labels are correctly predicted at the same rate (0 = perfect fairness)
 5. **Reports results** showing whether your classifier meets fairness thresholds
 
+
+![architecture-diagram.svg](architecture-diagram.svg)
+
+
+
 ### Key Features
 
 - **Simple CLI**: Built with docopt for easy command-line usage
